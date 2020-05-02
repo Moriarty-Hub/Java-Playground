@@ -1,121 +1,83 @@
-### Week03 - Summary
+### 网络资产信息管理系统 &《Java实战》Sample code
 
-在软件开发的过程中，我们经常需要面对的一个难题就是用户不断变化的需求。有时候，当用户需求出现了微小的改动，我们的代码就需要进行大面积的修改甚至是重构。因此，Java8引进了一些新的编程思想和功能，来帮助我们面对这样的变化，其中就有行为参数化以及Lambda表达式。
+开发环境：IntelliJ IDEA, Mysql 8.0, JDK1.8
 
-比如有一个装有Apple的List，起初用户希望能把里面为红色的苹果筛选出来，我们的实现方式就可以是这样
+系统简介：该系统主要是用于管理需要进行扫描的设备的列表，以及对扫描结果使用用户友好的方式展示出来，系统中设置了管理员与普通用户这两种角色，前者可以对待探测设备和用户进行增添和删除，后者则只能查看扫描结果以及个人信息。需要与网络资产信息收集系统配套使用，它通过爬取开源POC来检查局域网设备是否存在漏洞，并将扫描结果保存在数据库中
 
-```java
-public List<Apple> filterRedApple(List<Apple> apples) {
-    List<Apple> result = new LinkedList<>();
-    for (Apple apple : apples) {
-        if (apple.getColor().equals("RED")) {
-            result.add(apple);
-        }
-    }
-    return result;
-}
-```
+------
 
-一段时间以后，用户希望把功能修改为筛选大于100克的苹果，我们就需要再另外再加一个方法，如下
+### Week 6
 
-```java
-public List<Apple> filterHeaveyApple(List<Apple> apples) {
-	List<Apple> result = new LinkedList<>();
-	for (Apple apple : apples) {
-		if (apple.getWeight() > 100) {
-            result.add(apple);
-        }
-	}
-    return result;
-}
-```
+#### 完成内容：
 
-对比以上两段代码，我们可以发现他们存在着大量的重复，唯一的不同之处，除了方法名，就只是if后面的条件语句了，因此，我们能不能构造一个类似于模板的方法，将条件作为参数，传入模板里进行执行呢？这就要用到行为参数化这一思想了。
+1. 完善毕设项目，为User, Target这两个对象增加更多的字段，如Department, Job Title, Owner等，重构了这个系统的业务逻辑，并新增了用户设置/上传头像的功能。
 
-按照这种思路，我们需要把用来执行判断的代码，单独写到一个方法内。再构造一个方法，它接收两个参数，其中一个是我们要操作的对象，另外一个则是需要对对象执行的操作，而在函数体内，我们用传递进来的代码，对对象执行一个判断，如果符合，则将它添加到结果集中，并最终输出。
+#### 遇到的问题：
 
-```java
-public List<Apple> filterApple(List<Apple> apples, Predicate predicate) {
-	List<Apple> result = new LinkedList<>();
-    for (Apple apple : apples) {
-        if (predicate.test(apple)) {
-            result.add(apple);
-        }
-    }
-}
-```
-
-在这里，predicate是一个接口，其中有一个名为test的方法，其返回值是boolean类型。
-
-接下来，则需要用一个类来实现这一接口，并以参数的形式传递到filterApple这个方法里。
-
-当用户的需求为筛选红色苹果时，我们可以这样实现
-
-```java
-Public RedApplePredicate implements Predicate {
-    public static boolean test(Apple apple) {
-        if (apple.getColor().equals("RED")) {
-            return true;
-        }
-    }
-}
-```
-
-然后以这样的方式调用
-
-```
-List<Apple> result = filterApple(apples, RedApplePredicate);
-```
-
-这样一来我们就实现了用于判断的代码于实际执行的代码的解耦。
-
-但是我们发现，大量重复代码的问题依然存在，如果用户将需求改变为筛选苹果重量，那么我们还是要实现一个几乎和RedApplePredicate一样的类，并只对其中用于判断的部分进行修改，这个问题我们可以通过用行为参数化的思想配合Lambda表达式来解决。
-
-我们刚才已经定义好了List<Apple> filterApple(List<Apple> apples, Predicate predicate);这个方法，通过Lambda表达式，我们可以通过一行语句一次性的实现实例化接口、参数传递以及执行的过程。
-
-```
-List<Apple> result = filterApple(apples, (Apple apple) -> (apple.getColor().equals("RED")));
-```
-
-Lambda表达式的语法大概就是
-
-```
-(输入参数) -> (表达式)
-```
-
-其中输入参数可以没有，也可以将参数的类型省略，因为编译器会自动推断其类型。
-
-我通过三个例子来对以上知识点进行了实现，第一个位于week03.apple这个包内，主要是实现了以不同的格式来对列表里的Apple进行格式化输出。第二个位于week03.student包，它将数据库中的学生读取出来，并分别将历史学院、数学学院以及学分大于50的学生筛选出来。第三个则是在week03.function包中，读取一个字符串组成的List，然后将其中每个字符串的长度加入到另一个List中并返回，这个例子还用到了泛型方法相关的知识点。
+1.	在Controller.ManageTargetController.java这个文件中的updateTarget()这个方法里（第42-48行），我在返回页面的时候直接把Get请求的参数直接加到了URL里面，运行过程中没有发现什么问题，但是IDEA报错，那么正确的做法应该是怎样的呢？
+2.	还是在同一方法里的第47行的位置，我给model添加了isOwnerExist这一参数，但估计是因为页面重定向的缘故，这一attribute并没有被传递过去，应该怎么纠正呢？
+3.	我给这个系统设置了用户头像上传以及显示的功能，在开发过程中，我发现对于前端页面而言，它们的根目录是src/main/java/resources/static这个目录，这似乎就意味着我只能把要用于前端页面显示的图片存到这个目录以下的位置，而不能是磁盘的其他位置，是不是我采用的方法有问题呢？因为按理来说应该是磁盘上任一路径的图片都可以被读取到的，而不应该是被限制在这一文件夹下面（在profile.html这个文件中，当@{${avatar}}的值为/avatar/default.jpg的时候，读取的是src/main/java/resources/static/avatar/default.jpg这个文件，我由此推断出了它的根目录）
 
 
 
-### Week-04 Summary
+### Week 4
 
-本周学习了和流相关的概念，以及相关的使用。流可以理解为将多个操作拼接在一起形成的一条流水线，比如给定了一个装有1000个随机数的集合，我们想从这里面先筛选出不大于80的数，再对这些数字进行排序，接着再去除掉它们中所有重复的元素，并最终以List的形式返回给用户。
+#### 完成内容：
 
-以往，我们如果想进行这种操作，可能会采用这样的形式
+1.	《Java实战》第四、五章
+2.	学习了如何通过Spring Security组件自带的功能代替原有的登录验证，并对用户进行了普通用户与管理员这两种角色的区分，使管理员拥有了删除用户留言的功能
+3.	完成了毕设项目的部分功能，将前几周学到的知识都用到了这里面
 
-```
-List<Integer> result = Distinct(Sort(FilterNumbersLessThanEighty(randomNumberList)));
-```
+#### 遇到的问题：
 
-如果是采用流，则可以用这样的方式来完成
+1. 在Spring Boot里配置数据库的时候，我们是将数据库的URL，账号密码直接以明文的形式添加到application.properties里面的，在企业里进行开发的时候我们也是这样做的吗？感觉似乎有点不安全
 
-```
-List<Integer> result = randomNumberList.stream().filter(i -> i <= 80).sort().distinct().collect(toList());
-```
+    Answer: 在实际的企业开发中，数据库的用户名、密码及一些重要的配置是需要加密存储的，目前使用的加密的算法是 jasypt 加解密。如果项目中有使用到数据库连接池如druid，那么这个连接池会自带数据库用户名，密码的的加解密 具体参考：https://blog.csdn.net/jeikerxiao/article/details/96480136
 
-虽然看上去两种方式的表达都差不多，但内部实现却有很大差异。
 
-第一种方式采用的是外部迭代，也就是说得由用户自己去定义以什么样的规则去遍历并操作那个集合，并且所有操作都是以串行的方式进行，也就是说必须得等FilterNumbersLessThanEighty()这个函数将所有不大于80的数字筛选完并返回之后，Sort()这个函数才会对它进行排序，然后再是由Distinct()对它们进行去重操作。
 
-而第二种方式的迭代操作则是对用户透明的，用户无法知道也不能干涉程序迭代集合的方式，这一切完全是由程序自己决定的。另外，这些操作也会以并行的方式进行，也就是说，不必等filter()这一函数执行完成，后面的sort()函数便可以获取到一部分它操作产生的结果，然后对这部分结果进行排序，此时distinct()将会从这些结果中去除掉重复的元素再交给collect()来将它们组成列表。
+### Week 3
 
-这一点可以在week04.filter.FilterDistinctNumberLessThanEighty.java这个程序里体会得到，这个程序首先实现了RandomNumberSupplier这样一个不断产生随机数的类，然后FilterDistinctNumberLessThanEighty在main方法里用它不断产生新的随机数，再筛选出100个位于0到80之间的数字并对它们去重再输出。
+#### 完成内容：
 
-这个程序将会运行很长一段时间，在运行的过程中你会发现这些数字是每隔一小段时间就会输出一个，这就说明filter(),limit(),distince()这些方法还没执行完的时候，foreach()就已经开始对它们进行打印了。如果我们不采用流的话，那我们看到的效果将会是程序在很长一段时间里没有任何输出，并在最后一刻一下子输出全部的结果。
+1.	《Java实战》前三章内容
+2.	Mybatis的增删改查方法
+3.	学习Spring Security的使用，了解如何用它进行身份验证和访问控制
+4.	毕设项目的整体流程与数据库设计
 
-Stream这个对象将一些常用的操作集成在了内置方法里，比如filer()接收一个布尔表达式，将判断结果为true的对象返回；map()则是提供从一种数据类型到另一种数据类型之间的一种映射，比如传入一个字符串，并返回它的长度；而reduce()就是对数据进行聚合，比如获取一个数组里的最大值、最小值，或是总和等等。
 
-我在week04.practice这个包里完成了书中的一些练习题，就是利用流相关的操作来从Trader与Transaction这两个对象的集合里面筛选出符合条件的对象，这一点和模拟数据库的增删改查比较相似。
 
+### Week 2
+
+#### 完成内容：
+
+1. 对MessageBoard进行了重构，增加了Service层
+2. 继续完善了MessageBoard，为所有Controller及Service编写了测试代码
+
+#### 遇到的问题：
+
+1. 感觉目前我所掌握的mockito里的测试方法还非常有限，有些我所关心的数据还不知道该怎么测试。比如在BoardServiceTest.java这个文件的 testGetAllMessageOrderByCreateTimeDesc()方法中，我只测试了messageRepository.save()这个方法执行了多少次，但是如果在BoardService.java 的getAllMessageOrderByCreateTimeDesc()方法中我误把message.setCreator()的参数设为了messageContent，由于类型一致，在编译阶段并不会报错，运行时也不会出错， 应该怎么检测出来呢？还是说只能重构源代码才能检测？
+
+    Answer： 1、应该是addMessage方法的测试吧！你写成了testGetAllMessageOrderByCreateTimeDesc，已在BoardServiceTest#testAddMessage中给你加入如何测试的代码 2、测试的方法名、参数命名不规范，IndexServiceTest中的方法名test1VerifyUser、test2VerifyUser；IndexController#register方法的参数password1、password2 3、关于mockito的测试，网上也有很多资料，遇到不会写的或者没接触过的写法，但是自己心里有疑问的，可以上网查
+
+2. 再比如，我在BoardController.java的addMessage方法中给model添加了attribute，我想在测试的时候再对model调用一下getAttribute来检查一下值是否正确，应该怎么办呢？ 尝试过使用@InjectMocks去自动注入Model，但由于它是一个接口，所以这个办法行不通。（我在IndexControllerTest.java的test2LogIn()中尝试了一种办法， 就是在verify中把原来的anystring()替换为我实际期望的值，测试发现可行，但不知道是否符合标准）
+
+    Answer： 1、可以的，只要是验证了你的预期值和最终的实际值是一致的就是OK的，anystring()一般用于不是太关心具体值的时候为了方便可以可以这样写，最严谨的就是 你现在的这种写法，就是在verify中把原来的anyString()替换为我实际期望的值
+
+3. 在IndexControllerTest.java中的这个位置出现了一个报错，显示是第73行中期望的matcher数量和实际输入的不符，该怎么知道到底需要几个matcher以及应该放在参数中的哪个位置呢？ ![image](https://github.com/Moriarty-Hub/Message-Board/blob/master/image-20200405165305184.png) 
+
+    Answer： 1、在方法调用的时候是需要传"具体的参数"的值的，方法调用的时候是正常的程序调用，不属于Mockito的，不能使用any()、anyString()之类的，程序不认识 any()、anyString()这些是搭配Mockito的方法用的，一般用在when、verify、spy等等上的，所以你那样使用自然会报错，多写，多了解就熟悉了
+
+
+
+### Week 1
+
+#### 完成内容：
+
+1. 用Spring-Boot框架配合MySQL搭建一个多用户的留言板程序(暂时只关注后端功能，不考虑前端页面美观度)，实现用户的注册，登录，以及查看留言板和发布留言的功能，并部署在云服务器上。
+
+#### 遇到的问题：
+
+1. 不知道该如何对Controller编写测试
+
+    Answer: 参见test目录下的测试代码及注释
