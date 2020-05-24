@@ -27,6 +27,8 @@ public class DataSource {
                 Student student = new Student(ID, name, departmentName, totalCredit);
                 studentList.add(student);
             }
+            resultSet.close();
+            connection.close();
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
