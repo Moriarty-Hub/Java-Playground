@@ -1,7 +1,7 @@
 package week03.apple;
 
 enum Color {
-    RED, GREEN;
+    RED, GREEN
 }
 
 public class Apple {

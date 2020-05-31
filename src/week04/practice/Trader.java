@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Trader {
 
-    private String name;
+    private final String name;
     private String city;
 
     public Trader(String name, String city) {

@@ -14,7 +14,7 @@ public class Main {
         List<Student> students = new LinkedList<>();
         String sql = "SELECT ID, name, dept_name, tot_cred FROM student";
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             // 'com.mysql.jdbc.Driver' is deprecated
             Class.forName("com.mysql.cj.jdbc.Driver");
